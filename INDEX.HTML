@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-    
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,36 +7,60 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="container">
-    <p>Enter your text or URL</p>
-    <input type="text' placeholder="Text or URL" id="qrText">
-    <div id="imgbox">
-<img src=""  id="qrImage"/>   
+    <div class="container">
+        <p>Enter your text or URL</p>
+        <input type="text" placeholder="Text or URL" id="qrText">
+        
+        <div id="imgBox">
+            <img src="" id="qrImage"/>   
+        </div>
+        
+        <div class="button-group">
+            <button onclick="generateQR()" id="btn">Generate</button>
+        </div>
+        <div class="button-group">
+            <button onclick="downloadQR()" id="downloadBtn" style="display:none;">Download</button>
+        </div>
     </div>
-    <button onclick="generateQR()" id="btn">Generate</button>
-</div>
-<script>
-    let imgBox = document.getElementById("imgBox");
+
+    <script>
+        let imgBox = document.getElementById("imgBox");
 let qrImage = document.getElementById("qrImage");
 let qrText = document.getElementById("qrText");
 let btn = document.getElementById("btn");
-   
+let downloadBtn = document.getElementById("downloadBtn");
 
-    function generateQR(){
-        btn.innerHTML = 'Loading...'
-        // qrImage.src = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + qrText.value;
-        fetch( "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + qrText.value).then(res=>{
-            console.log(res);
-            qrImage.src = res.url.toString();
-            
-        }).catch(err=>{
-            console.log(err);})
-            .finally(()=>{
-                btn.innerHTML = 'Generate'
-            })
-            
+function generateQR() {
+    const data = encodeURIComponent(qrText.value.trim());
+    if (!data) {
+        alert("Please enter a valid URL or text.");
+        return;
+    }
 
+    const qrURL = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${data}`;
+
+    btn.innerHTML = 'Loading...';
+    qrImage.onload = function () {
+        imgBox.style.display = 'block';
+        downloadBtn.style.display = 'block';
+        btn.innerHTML = 'Generate';
+    };
+    qrImage.onerror = function () {
+        alert("Failed to generate QR Code.");
+        btn.innerHTML = 'Generate';
+    };
+    qrImage.src = qrURL;
 }
-</script>
+
+function downloadQR() {
+    const link = document.createElement('a');
+    link.href = qrImage.src;
+    link.download = 'qr_code.jpg';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+    </script>
 </body>
 </html>
